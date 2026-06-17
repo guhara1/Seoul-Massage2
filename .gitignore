@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .claude/
+
+# Google Indexing API 서비스 계정 키(비밀)
+tools/service_account.json

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://seoul-massage2.pages.dev/sitemap.xml
+# RSS: https://seoul-massage2.pages.dev/rss.xml

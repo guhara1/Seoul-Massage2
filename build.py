@@ -31,6 +31,8 @@ MIN_INDEX_CHARS = 2000
 SITE_UPDATED = "2026-06-17"  # 콘텐츠 최종 검토일(스키마 dateModified·바이라인 공통)
 OG_IMAGE = BASE_URL.rstrip("/") + "/assets/og-image.png"
 LOGO_IMAGE = BASE_URL.rstrip("/") + "/assets/icon-512.png"
+NAVER_VERIFY = "1ff3a1c869e9bab45794e9bd378e1abb"  # 네이버 서치어드바이저
+INDEXNOW_KEY = "35ef6a8d6cc69568452f8e3b898d69c7"  # IndexNow(빙·네이버·얀덱스)
 
 
 def text_length(body_html: str) -> int:
@@ -247,6 +249,8 @@ def render_page(page: dict) -> str:
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{BASE_URL.rstrip('/')}/assets/og-image.png">
+<meta name="naver-site-verification" content="{NAVER_VERIFY}">
+<link rel="alternate" type="application/rss+xml" title="{BRAND} 최신 안내" href="/rss.xml">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
@@ -336,6 +340,7 @@ def render_page(page: dict) -> str:
 def build() -> None:
     report = []
     sitemap_urls = []
+    rss_items = []  # (loc, title, desc)
 
     for page in PAGES:
         path = page["path"]  # "" 또는 "gwangju-gyeonggi/.../" 형태
@@ -348,7 +353,9 @@ def build() -> None:
         chars = text_length(page["body"])
         noindex = page.get("noindex", False) or chars < MIN_INDEX_CHARS
         if not noindex:
-            sitemap_urls.append(BASE_URL.rstrip("/") + "/" + path)
+            loc = BASE_URL.rstrip("/") + "/" + path
+            sitemap_urls.append(loc)
+            rss_items.append((loc, page["title"], page["desc"]))
         report.append((path or "/", chars, "noindex" if noindex else "index"))
 
     # sitemap.xml
@@ -362,11 +369,39 @@ def build() -> None:
             f"{urls}\n</urlset>\n"
         )
 
-    # robots.txt
+    # rss.xml — 네이버·검색엔진 색인 보조용 피드(인덱스 대상 전 페이지)
+    rss_date = "Tue, 17 Jun 2026 00:00:00 +0900"
+    items = "\n".join(
+        "    <item>"
+        f"<title>{html.escape(t)}</title>"
+        f"<link>{loc}</link>"
+        f"<guid isPermaLink=\"true\">{loc}</guid>"
+        f"<description>{html.escape(d)}</description>"
+        f"<pubDate>{rss_date}</pubDate>"
+        "</item>"
+        for loc, t, d in rss_items
+    )
+    with open(os.path.join(ROOT, "rss.xml"), "w", encoding="utf-8") as f:
+        f.write(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+            "  <channel>\n"
+            f"    <title>{html.escape(BRAND)} — 서울 출장마사지·홈타이 지역 안내</title>\n"
+            f"    <link>{BASE_URL.rstrip('/')}/</link>\n"
+            f"    <description>서울 권역·자치구·역세권별 방문 마사지 안내</description>\n"
+            "    <language>ko</language>\n"
+            f"    <lastBuildDate>{rss_date}</lastBuildDate>\n"
+            f'    <atom:link href="{BASE_URL.rstrip("/")}/rss.xml" rel="self" type="application/rss+xml"/>\n'
+            f"{items}\n"
+            "  </channel>\n</rss>\n"
+        )
+
+    # robots.txt — 사이트맵·RSS 위치를 함께 안내
     with open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(
             "User-agent: *\nAllow: /\n\n"
             f"Sitemap: {BASE_URL.rstrip('/')}/sitemap.xml\n"
+            f"# RSS: {BASE_URL.rstrip('/')}/rss.xml\n"
         )
 
     # .nojekyll (GitHub Pages)
