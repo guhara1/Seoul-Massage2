@@ -1,8 +1,13 @@
-from .site import (DISTRICTS, BASE_URL, BRAND, PHONE, PHONE_DISPLAY, STATIONS_MENU, ZONES,
-                   district_url, station_url, zone_url, station_groups_html)
+from .site import (DISTRICTS, AREAS, BASE_URL, BRAND, PHONE, PHONE_DISPLAY, STATIONS_MENU, ZONES,
+                   district_url, station_url, zone_url, area_url, station_groups_html)
 from .pricing import PRICING
 
 _STATION_GROUPS_HTML = station_groups_html()
+
+_AREA_CARDS = "".join(
+    f'<li><a href="{area_url(slug)}">{name} 출장마사지</a></li>'
+    for slug, name in AREAS
+)
 
 _DISTRICT_CARDS = "".join(
     f'<li><a href="{district_url(slug)}">{name}</a></li>'
@@ -115,8 +120,14 @@ _BODY = f"""
 <p>서울은 지역별 이동 환경이 크게 달라 자치구와 역세권을 함께 알아두면 예약이 한결 수월합니다. {BRAND}는 서울특별시 전지역을 기준으로 방문 가능 여부, 예약 절차, 비용 기준을 투명하게 안내합니다. 이 페이지는 서울 전체 구조를 설명하는 허브 역할을 합니다. 자치구별 상세 안내는 아래 자치구 카드에서, 역세권 기준 안내는 역세권 카드에서 확인하실 수 있습니다. 관리사가 고객님의 자택이나 숙소로 직접 방문하므로 역이나 약속 장소에서 만나는 절차는 없습니다.</p>
 </section>
 
+<section id="areas">
+<h2>강남·잠실·홍대·여의도 주요 생활권 안내</h2>
+<p>서울은 같은 도시 안에서도 강남역 주변, 여의도 업무지구, 홍대·합정 상권, 잠실·송파 생활권, 서울역·용산 생활권, 노원·상계 주거권의 성격이 모두 다릅니다. 그래서 이 사이트는 25개 구를 바로 펼치기 전에, 비슷한 성격의 자치구와 역세권을 묶은 8개 권역 허브를 먼저 두었습니다. 권역 페이지는 단독으로 방문자를 모으는 얇은 페이지가 아니라, 자치구와 역세권을 자연스럽게 연결하는 중간 허브 역할을 합니다. 본인 위치가 어느 권역인지 먼저 고른 뒤 자치구·역세권으로 좁혀가시면 가장 빠릅니다.</p>
+<ul class="card-grid">{_AREA_CARDS}</ul>
+</section>
+
 <section id="coverage">
-<h2>25개 자치구 기준 지역 구조</h2>
+<h2>서울 25개 자치구별 방문 가능 지역</h2>
 <p>서울특별시는 강남구·강동구·강북구·강서구·관악구·광진구·구로구·금천구·노원구·도봉구·동대문구·동작구·마포구·서대문구·서초구·성동구·성북구·송파구·양천구·영등포구·용산구·은평구·종로구·중구·중랑구 25개 자치구와 427개 행정동으로 구성됩니다. 각 자치구는 구 단위 허브 → 대표 행정동 → 인근 역세권 순으로 계층 구조를 이루며, 자치구별 페이지에서는 해당 구의 특성과 주요 행정동, 역세권, 이용 수요 패턴을 자세히 확인하실 수 있습니다.</p>
 <p>번호 동은 별도 페이지를 운영하지 않고 대표 페이지로 통합합니다. 방배1~4동은 방배동 페이지로, 목1~5동은 목동 페이지로, 상계1~10동은 상계동 페이지로 통합하여 운영합니다. 번호 동 주소로 문의하셔도 같은 생활권으로 안내해 드리며, 해당 동의 방문 기준을 동일하게 안내받으실 수 있습니다. 아래 25개 자치구 카드에서 거주하시는 구를 선택해 세부 안내를 확인해 주세요.</p>
 <ul class="card-grid">{_DISTRICT_CARDS}</ul>
@@ -195,9 +206,9 @@ _CTA = f"""
 
 PAGE = {
     "path": "",
-    "title": "서울 출장마사지｜서울특별시 홈타이 지역별 예약 안내",
-    "desc": "서울 출장마사지·홈타이 예약 전 자치구, 역세권, 이용 기준을 정리했습니다.",
-    "h1": "서울 출장마사지 · 서울특별시 홈타이 지역별 예약 안내",
+    "title": "서울 출장마사지｜자치구·역세권별 홈타이 예약 안내",
+    "desc": "서울 출장마사지·홈타이 예약 전 자치구, 역세권, 이용 기준을 확인하세요.",
+    "h1": "서울 출장마사지 · 서울 홈타이 지역별 예약 안내",
     "extra_head": _JSONLD,
     "hero": _HERO,
     "body": _BODY + PRICING + _CTA,

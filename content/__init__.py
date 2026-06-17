@@ -31,20 +31,41 @@ def _consolidation_map(pages):
     return m
 
 
+# 권역(area) 허브가 직접 연결하는 핵심 역세권은 개별 페이지로 되살린다(통합 제외).
+REVIVE_STATIONS = {
+    "gangdong-station-chuljangmassage", "myeongdong-station-chuljangmassage",
+    "gwanghwamun-station-chuljangmassage", "hoegi-station-chuljangmassage",
+    "changdong-station-chuljangmassage", "miasageori-station-chuljangmassage",
+    "ssangmun-station-chuljangmassage", "magongnaru-station-chuljangmassage",
+    "kkachisan-station-chuljangmassage", "omokgyo-station-chuljangmassage",
+}
+
+
+def _is_revived(path):
+    return path.rstrip("/").split("/")[-1] in REVIVE_STATIONS
+
+
 REDIRECTS = {}
 REDIRECTS.update(_consolidation_map(dongs_gen.PAGES))
-REDIRECTS.update(_consolidation_map(stations_gen.PAGES))
+REDIRECTS.update({k: v for k, v in _consolidation_map(stations_gen.PAGES).items()
+                  if not _is_revived(k)})
 register_consolidated(REDIRECTS)
 
-# 3) 나머지 페이지 모듈 import (등록된 레지스트리·통합 정보를 사용)
-from . import main, districts, dongs, stations, zones, info
+# 되살린 역 페이지는 통합 등록 '후' 다시 빌드해야 본문 내부 링크가 통합을
+# 인식한다(첫 build() 는 통합 전이라 통합된 역으로 죽은 링크가 생긴다).
+_revived_station_pages = [p for p in stations_gen.build() if _is_revived(p["path"])]
 
-# 통합된 얇은 페이지(dongs_gen·stations_gen)는 PAGES 에서 제외 → 빌드/사이트맵 미포함.
+# 3) 나머지 페이지 모듈 import (등록된 레지스트리·통합 정보를 사용)
+from . import main, areas, districts, dongs, stations, zones, info
+
+# 통합된 얇은 페이지는 PAGES 에서 제외 → 빌드/사이트맵 미포함.
 PAGES = (
     [main.PAGE]
+    + areas.PAGES
     + districts.PAGES
     + dongs.PAGES
     + stations.PAGES
+    + _revived_station_pages
     + zones.PAGES
     + info.PAGES
 )

@@ -74,6 +74,19 @@ ZONES = [
     ("nowon-sanggye-zone-chuljangmassage", "노원·상계 생활권"),
 ]
 
+# 8개 권역(area) 허브 — 서울을 25개 구로 바로 펼치지 않고, 자치구와 역세권을
+# 연결하는 중간 허브. (slug, 메뉴 표기명)
+AREAS = [
+    ("gangnam-seocho-area-chuljangmassage", "강남·서초권"),
+    ("songpa-gangdong-area-chuljangmassage", "송파·강동권"),
+    ("mapo-seodaemun-eunpyeong-area-chuljangmassage", "마포·서대문·은평권"),
+    ("yeongdeungpo-guro-geumcheon-area-chuljangmassage", "영등포·구로·금천권"),
+    ("yongsan-jongno-jung-area-chuljangmassage", "용산·중구·종로권"),
+    ("seongdong-gwangjin-dongdaemun-area-chuljangmassage", "성동·광진·동대문권"),
+    ("nowon-dobong-gangbuk-area-chuljangmassage", "노원·도봉·강북권"),
+    ("gangseo-yangcheon-area-chuljangmassage", "강서·양천권"),
+]
+
 
 def district_url(slug):
     return f"/seoul/{slug}/"
@@ -104,6 +117,10 @@ def station_url(slug):
 
 
 def zone_url(slug):
+    return f"/seoul/{slug}/"
+
+
+def area_url(slug):
     return f"/seoul/{slug}/"
 
 
@@ -476,6 +493,9 @@ NAV = [
         ("전지역 방문 가능", "/#coverage"),
         ("예약 전 확인 기준", "/#check"),
         ("홈타이 이용 가이드", "/hometai-guide/"),
+    ]),
+    ("권역별 안내", "/#areas", [
+        (name, area_url(slug)) for slug, name in AREAS
     ]),
     ("자치구별 안내", "/#districts", [
         (name, district_url(slug)) for slug, name in DISTRICTS

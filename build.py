@@ -381,6 +381,7 @@ def build() -> None:
         f'      <li><a href="{href}">{name}</a></li>'
         for name, href in [
             ("홈", main_url),
+            ("권역별 안내", main_url + "#areas"),
             ("자치구별 안내", main_url + "#districts"),
             ("역세권별 안내", main_url + "#stations"),
             ("생활권별 안내", main_url + "#zones"),
