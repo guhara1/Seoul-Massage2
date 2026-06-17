@@ -17,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from content import PAGES
+from content import PAGES, REDIRECTS
 from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
                           PHONE_DISPLAY)
 
@@ -358,11 +358,23 @@ def build() -> None:
     # .nojekyll (GitHub Pages)
     open(os.path.join(ROOT, ".nojekyll"), "w").close()
 
+    # 통합된 얇은 동·역 페이지 → 소속 자치구로 301. 과거 빌드 산출물도 삭제한다.
+    removed = 0
+    for rel_path in REDIRECTS:
+        stale = os.path.join(ROOT, rel_path)
+        if os.path.isdir(stale):
+            shutil.rmtree(stale)
+            removed += 1
+
     # 메인 허브가 루트(/)에서 직접 제공되므로 별도 리다이렉트 스텁은 두지 않는다.
     # 과거 /seoul-chuljangmassage/ 링크는 Cloudflare _redirects 로 301 처리한다.
     main_url = "/"
     with open(os.path.join(ROOT, "_redirects"), "w", encoding="utf-8") as f:
         f.write("/seoul-chuljangmassage/  /  301\n/seoul-chuljangmassage  /  301\n")
+        for rel_path, target in sorted(REDIRECTS.items()):
+            src = "/" + rel_path.rstrip("/") + "/"
+            f.write(f"{src}  {target}  301\n")
+            f.write(f"{src.rstrip('/')}  {target}  301\n")
 
     # 404.html — 존재하지 않는 페이지 안내
     nf_links = "\n".join(

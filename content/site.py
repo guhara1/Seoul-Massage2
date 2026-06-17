@@ -79,8 +79,28 @@ def district_url(slug):
     return f"/seoul/{slug}/"
 
 
+# ── 통합(consolidation) 레지스트리 ───────────────────────────────
+# 얇은 자동생성 동·역 페이지는 개별 페이지를 만들지 않고 소속 자치구
+# 페이지로 301 통합한다. 여기에 등록된 경로는 (1) 빌드되지 않고
+# (2) 모든 내부 링크가 자동으로 자치구 페이지를 가리킨다.
+_CONSOLIDATED = {}  # 상대경로("seoul/<slug>/") → 자치구 URL("/seoul/<gu>/")
+
+
+def register_consolidated(mapping):
+    _CONSOLIDATED.update(mapping)
+
+
+def is_consolidated(path):
+    return path in _CONSOLIDATED
+
+
+def _resolve(path):
+    """주어진 페이지 상대경로가 통합 대상이면 자치구 URL을, 아니면 자기 URL을 돌려준다."""
+    return _CONSOLIDATED.get(path, "/" + path)
+
+
 def station_url(slug):
-    return f"/seoul/{slug}/"
+    return _resolve(f"seoul/{slug}/")
 
 
 def zone_url(slug):
@@ -88,7 +108,7 @@ def zone_url(slug):
 
 
 def dong_url(slug):
-    return f"/seoul/{slug}-chuljangmassage/"
+    return _resolve(f"seoul/{slug}-chuljangmassage/")
 
 
 # ────────────────────────────────────────────────
@@ -258,12 +278,16 @@ def station_groups_html():
 
 
 def related_links_html(title, pairs):
-    """롱테일 키워드 앵커로 구성한 내부링크 블록.
-    pairs: [(앵커텍스트, href), ...] — href 가 없으면(None) 건너뛴다."""
-    items = "".join(
-        f'<li><a href="{href}">{anchor}</a></li>'
-        for anchor, href in pairs if href
-    )
+    """내부링크 블록. pairs: [(앵커텍스트, href), ...] — href 가 없으면 건너뛴다.
+    같은 href 로 향하는 앵커는 하나만 남겨(키워드 떡칠·도어웨이 신호 방지) 중복 제거한다."""
+    seen = set()
+    lis = []
+    for anchor, href in pairs:
+        if not href or href in seen:
+            continue
+        seen.add(href)
+        lis.append(f'<li><a href="{href}">{anchor}</a></li>')
+    items = "".join(lis)
     if not items:
         return ""
     return (
@@ -339,7 +363,9 @@ def dong_nav_section(gu_slug, gu_name):
     pages = _DONG_LINKS.get(gu_slug, {})
     items = []
     for d in sorted(dongs):
-        if d in pages:
+        # 통합된(자치구로 흡수된) 동은 자기 페이지로 링크하면 순환이 되므로
+        # 텍스트로만 표시한다. 개별 상세 페이지가 살아있는 동만 링크한다.
+        if d in pages and not is_consolidated(f"seoul/{pages[d]}-chuljangmassage/"):
             items.append(f'<li><a href="{dong_url(pages[d])}">{d}</a></li>')
         else:
             items.append(f'<li><span>{d}</span></li>')
@@ -371,33 +397,29 @@ def dong_related_block(gu_slug, gu_name, dong_name):
     같은 구의 다른 동·권역 역세권·자치구·허브로 연결한다."""
     seed = sum(ord(c) for c in (dong_name + gu_slug))
     pages = _DONG_LINKS.get(gu_slug, {})
-    siblings = sorted((d, s) for d, s in pages.items() if d != dong_name)
-    sib = _pick2(siblings, seed)
-    sts = gu_stations(gu_slug, 3)
-    st = _pick2(sts, seed)
-
-    pairs = [(f"{gu_name} 출장마사지·홈타이 전체 안내", district_url(gu_slug))]
-    sib_anchors = ["{0} 출장마사지 방문 예약 안내", "{0} 홈타이 당일 예약 가능 지역"]
-    for idx, (d, s) in enumerate(sib):
-        pairs.append((sib_anchors[idx].format(d), dong_url(s)))
-    for n, s in st:
-        # 역 이름 앵커에는 키워드를 붙이지 않는다(도어웨이 방지)
-        pairs.append((n, station_url(s)))
-    pairs.append(("서울 전지역 방문 출장마사지·홈타이 예약 안내", _HUB))
-    return related_links_html(
-        f"{dong_name} 함께 보면 좋은 출장마사지·홈타이 안내", pairs
+    # 통합되지 않고 개별 페이지가 살아있는 같은 구의 다른 동만(평범한 지명 앵커).
+    siblings = sorted(
+        (d, s) for d, s in pages.items()
+        if d != dong_name and not is_consolidated(f"seoul/{s}-chuljangmassage/")
     )
+    sib = _pick2(siblings, seed)
+
+    pairs = [(f"{gu_name} 전체 안내", district_url(gu_slug))]
+    for d, s in sib:
+        pairs.append((d, dong_url(s)))
+    pairs.append(("서울 전지역 안내(홈)", _HUB))
+    return related_links_html(f"{gu_name} 주변 함께 보기", pairs)
 
 
 def district_related_block(gu_slug, gu_name):
-    """자치구 페이지용 롱테일 키워드 내부링크 블록(권역 역세권 + 허브)."""
-    # 역 이름 앵커에는 키워드를 붙이지 않는다(도어웨이 방지)
-    pairs = [(n, station_url(s)) for n, s in gu_stations(gu_slug, 4)]
-    pairs.append((f"{gu_name} 행정동별 출장마사지 방문 가능 지역", _HUB + "#districts"))
-    pairs.append(("서울 전지역 출장마사지·홈타이 예약 안내", _HUB))
-    return related_links_html(
-        f"{gu_name} 주변 역세권 출장마사지·홈타이 안내", pairs
-    )
+    """자치구 페이지용 내부링크 블록(살아있는 권역 역세권 + 허브, 평범한 지명 앵커)."""
+    pairs = [
+        (n, station_url(s)) for n, s in gu_stations(gu_slug, 4)
+        if not is_consolidated(f"seoul/{s}/")
+    ]
+    pairs.append(("서울 자치구별 안내", _HUB + "#districts"))
+    pairs.append(("서울 전지역 안내(홈)", _HUB))
+    return related_links_html(f"{gu_name} 주변 역세권 함께 보기", pairs)
 
 
 # 생활권 slug → 대표 역(롱테일 내부링크용)
@@ -422,13 +444,10 @@ def zone_related_block(zone_slug, zone_name):
     for n in ZONE_STATIONS.get(zone_slug, []):
         s = _STATION_NAME_TO_SLUG.get(n)
         if s:
-            # 역 이름 앵커에는 키워드를 붙이지 않는다(도어웨이 방지)
             pairs.append((n, station_url(s)))
-    pairs.append(("서울 자치구별 출장마사지 방문 가능 지역", _HUB + "#districts"))
-    pairs.append(("서울 전지역 방문 출장마사지·홈타이 예약 안내", _HUB))
-    return related_links_html(
-        f"{zone_name} 함께 보면 좋은 출장마사지·홈타이 안내", pairs
-    )
+    pairs.append(("서울 자치구별 안내", _HUB + "#districts"))
+    pairs.append(("서울 전지역 안내(홈)", _HUB))
+    return related_links_html(f"{zone_name} 함께 보기", pairs)
 
 
 def station_related_block(station_slug, station_name):
@@ -439,15 +458,14 @@ def station_related_block(station_slug, station_name):
             region, members = rname, sts
             break
     seed = sum(ord(c) for c in station_slug)
-    sib = [(n, s) for n, s in members if s != station_slug]
+    # 통합되지 않고 개별 페이지가 살아있는 같은 권역의 다른 역만(평범한 지명 앵커).
+    sib = [(n, s) for n, s in members
+           if s != station_slug and not is_consolidated(f"seoul/{s}/")]
     sib = _pick2(sib, seed) if len(sib) > 2 else sib
-    # 역 이름 앵커에는 키워드를 붙이지 않는다(도어웨이 방지)
     pairs = [(n, station_url(s)) for n, s in sib]
-    pairs.append((f"{region} 전체 역세권 출장마사지 안내", _HUB + "#stations"))
-    pairs.append(("서울 전지역 방문 출장마사지·홈타이 예약 안내", _HUB))
-    return related_links_html(
-        f"{station_name} 함께 보면 좋은 출장마사지·홈타이 안내", pairs
-    )
+    pairs.append((f"{region} 역세권 안내", _HUB + "#stations"))
+    pairs.append(("서울 전지역 안내(홈)", _HUB))
+    return related_links_html(f"{station_name} 주변 역세권 함께 보기", pairs)
 
 
 # 상단 메뉴
