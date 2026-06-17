@@ -254,27 +254,13 @@ def _body(dong, gu, subway, landmarks, trait, slug):
 # 제목 패턴 풀 — 모두 '{동} 출장마사지'로 시작하며, 뒷부분만 다르게 골라
 # 동마다 고유한 제목을 만든다.
 def _title(dong, gu, subway, l0, slug):
-    return _pick([
-        f"{dong} 출장마사지｜{gu} {dong} 홈타이 방문 예약",
-        f"{dong} 출장마사지·홈타이｜{l0} 인근 방문 관리",
-        f"{dong} 출장마사지｜{subway} {dong} 홈타이 방문 안내",
-        f"{dong} 출장마사지 - {gu} 24시간 방문 홈타이",
-        f"{dong} 출장마사지｜{l0} 일대 홈타이 안내",
-        f"{dong} 출장마사지·홈타이 방문｜{gu} 당일 예약",
-        f"{dong} 출장마사지｜{subway} 인근 {dong} 홈타이",
-        f"{dong} 출장마사지｜{l0}·{subway} 방문 관리",
-    ], slug, 11)
+    # 원본 패턴(돌려막기 없이) — 지역명·구로 고유하게.
+    return f"{dong} 출장마사지·홈타이 — {gu} 방문 예약 가이드"
 
 
-# 설명(meta description) 패턴 풀 — 동별 사실을 넣어 고유하게 만든다.
 def _desc(dong, gu, subway, l0, l1, trait, slug):
-    return _pick([
-        f"{gu} {dong} 출장마사지·홈타이. {subway} 인근, {l0}·{l1} 일대 자택·숙소 방문. 당일 예약 상담 가능.",
-        f"{dong} 홈타이 방문 관리. {trait[:-1] if trait.endswith('.') else trait} {l0} 일대 출장마사지 예약 안내.",
-        f"{subway} 기준 {dong} 출장마사지. {l0}·{l1} 주변 아파트·오피스텔 방문 홈타이, {gu} 전 지역 가능.",
-        f"{gu} {dong} 방문 홈타이·출장마사지 안내. {l0} 인근 당일 예약, 위생·안전 기준 준수 방문 관리.",
-        f"{dong} 출장마사지 예약. {subway}에서 가까운 {l0}·{l1} 일대 자택 방문, 저녁·야간 시간대 상담 가능.",
-    ], slug, 13)
+    return (f"{subway} 인근 {dong} 방문 출장마사지·홈타이. {l0}·{l1} 일대 자택·숙소로 "
+            f"직접 방문하며 예약·도착 시간을 통화로 안내합니다.")
 
 
 def _make(dong, slug, gu_name, gu_slug, subway, landmarks, trait):
@@ -285,7 +271,7 @@ def _make(dong, slug, gu_name, gu_slug, subway, landmarks, trait):
         "path": f"seoul/{slug}-chuljangmassage/",
         "title": title,
         "desc": desc,
-        "h1": f"{dong} 출장마사지·홈타이 안내",
+        "h1": f"{dong} 방문 출장마사지·홈타이 안내",
         "body": build_body(dong, "dong", gu_name, subway, landmarks, trait, slug)
         + dong_related_block(gu_slug, gu_name, dong) + PRICING + _CTA,
         "breadcrumb": [

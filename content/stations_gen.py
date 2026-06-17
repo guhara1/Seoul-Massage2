@@ -295,22 +295,13 @@ def _pick(options, slug, salt):
 
 
 def _title(name, gu_name, lines, slug):
-    return _pick([
-        f"{name} 출장마사지｜{gu_name} {name} 홈타이 방문 안내",
-        f"{name} 출장마사지·홈타이｜{lines} {name} 인근 방문 관리",
-        f"{name} 출장마사지｜{name} 인근 자택·숙소 홈타이 예약",
-        f"{name} 출장마사지·홈타이 방문｜{gu_name} {name} 당일 예약",
-        f"{name} 출장마사지｜{name} 역세권 홈타이 방문 안내",
-    ], slug, 11)
+    # 원본 패턴(돌려막기 없이) — 역명·자치구로 고유하게.
+    return f"{name} 출장마사지·홈타이 — {gu_name} 방문 예약 안내"
 
 
 def _desc(name, gu_name, lines, feature, slug):
-    return _pick([
-        f"{name} 출장마사지·홈타이. {lines} {name} 인근 자택·숙소 방문 관리, {gu_name} 전 지역 당일 예약 가능.",
-        f"{gu_name} {name} 출장마사지 예약. {feature[:24]} 일대 방문 홈타이, 저녁·야간 상담 가능.",
-        f"{name} 역세권 홈타이·출장마사지 안내. {lines} 이용 시 가까운 위치로 방문, 위생·안전 기준 준수.",
-        f"{name} 출장마사지 방문 안내. {name} 주변 아파트·오피스텔·숙소로 직접 방문, {gu_name} 전역 가능.",
-    ], slug, 13)
+    return (f"{lines} {name} 인근 방문 출장마사지·홈타이. {gu_name} 자택·숙소·사무실로 "
+            f"직접 방문하며, 예약 시 도착 예정 시간을 안내합니다.")
 
 
 def _body(name, gu_name, lines, feature, region, slug):
@@ -451,7 +442,7 @@ def build():
             "path": f"seoul/{slug}/",
             "title": _title(name, gu_name, lines, slug),
             "desc": _desc(name, gu_name, lines, feature, slug),
-            "h1": f"{name} 출장마사지·홈타이 안내",
+            "h1": f"{name} 방문 출장마사지·홈타이 안내",
             "body": body + station_related_block(slug, name) + PRICING + _CTA,
             "breadcrumb": [
                 ("역세권별 안내", "/#stations"),

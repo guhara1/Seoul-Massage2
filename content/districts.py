@@ -8,20 +8,19 @@ _CTA = f"""<section class="cta"><h2>예약문의</h2><p>방문 위치와 희망 
 
 
 def _district(slug, name, title, desc, body):
-    # 원본 zip 복제본인 수기 본문(body) 대신, 각 구의 실제 행정동·역세권
-    # 데이터로 원본 엔진 본문을 생성한다(사이트 단위 중복 제거).
-    gen = district_body(
-        name,
-        GU_REGION.get(slug, "서울"),
-        DISTRICT_DONGS.get(slug, []),
-        gu_stations(slug, 6),
-        slug,
-    )
+    # 원본 zip 복제본인 수기 본문·제목·설명 대신, 각 구의 실제 데이터로
+    # 원본 본문/메타를 생성한다(사이트 단위 중복 제거).
+    region = GU_REGION.get(slug, "서울")
+    dongs = DISTRICT_DONGS.get(slug, [])
+    d0 = dongs[0] if dongs else name
+    d1 = dongs[1] if len(dongs) > 1 else d0
+    d2 = dongs[2] if len(dongs) > 2 else d1
+    gen = district_body(name, region, dongs, gu_stations(slug, 6), slug)
     return {
         "path": f"seoul/{slug}/",
-        "title": title,
-        "desc": desc,
-        "h1": f"{name} 출장마사지·홈타이 안내",
+        "title": f"{name} 출장마사지·홈타이 — {region} 방문 예약 가이드",
+        "desc": f"{region} {name} 전역 방문 출장마사지·홈타이. {d0}·{d1}·{d2} 등 자택·숙소로 직접 방문하며 예약·이동비는 통화로 안내합니다.",
+        "h1": f"{name} 방문 출장마사지·홈타이 안내",
         "body": gen + dong_nav_section(slug, name) + district_related_block(slug, name) + PRICING + _CTA,
         "breadcrumb": [("자치구별 안내", "/#districts"), (name, None)],
     }

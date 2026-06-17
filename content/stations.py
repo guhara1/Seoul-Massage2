@@ -44,9 +44,9 @@ def _station(slug, name, title, desc, body):
     gen = build_body(name, "station", gu_name, transit, landmarks, feat, slug)
     return {
         "path": f"seoul/{slug}/",
-        "title": title,
-        "desc": desc,
-        "h1": f"{name} 출장마사지·홈타이 안내",
+        "title": f"{name} 출장마사지·홈타이 — {gu_name} 방문 예약 안내",
+        "desc": f"{transit} {name} 인근 방문 출장마사지·홈타이. {gu_name} 자택·숙소·사무실로 직접 방문하며, 예약 시 도착 예정 시간을 안내합니다.",
+        "h1": f"{name} 방문 출장마사지·홈타이 안내",
         "body": gen + station_related_block(slug, name) + PRICING + _CTA,
         "breadcrumb": [("역세권별 안내", "/#stations"), (name, None)],
     }
