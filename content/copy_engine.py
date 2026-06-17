@@ -315,6 +315,13 @@ def build_body(place, kind, gu, transit, landmarks, trait, slug):
     book1, book2 = _booking(place, slug)
     tip1, tip2 = _tips(place, slug)
 
+    # 같은 아키타입 페이지끼리의 유사도를 낮추기 위해, 페이지 고유의 실제
+    # 지명·노선을 본문 곳곳에 한 번 더 박아 넣는다(중복/유사 신호 완화).
+    visit2 = (f"{visit2} {place} 방문은 {l0}·{l1}·{l2} 방면을 중심으로 이뤄지며, "
+              f"{transit} 인근 어느 쪽에서 문의하셔도 같은 기준으로 안내합니다.")
+    care2 = (f"{care2} {l0}·{l1} 일대에서 {place}을(를) 기준으로 이동하므로, "
+             f"가까운 위치와 그날의 결림 부위를 알려주시면 동선과 코스를 함께 맞춰 드립니다.")
+
     # 모든 페이지가 가진 '고유한 한 줄 특성'을 리드 첫 문장으로 — 페이지마다 다른 텍스트.
     t = trait[:-1] if trait.endswith(".") else trait
     if kind == "station":

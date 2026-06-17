@@ -23,6 +23,9 @@ from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MIN_INDEX_CHARS = 2000
+SITE_UPDATED = "2026-06-17"  # 콘텐츠 최종 검토일(스키마 dateModified·바이라인 공통)
+OG_IMAGE = BASE_URL.rstrip("/") + "/assets/og-image.png"
+LOGO_IMAGE = BASE_URL.rstrip("/") + "/assets/icon-512.png"
 
 
 def text_length(body_html: str) -> int:
@@ -105,6 +108,22 @@ def webpage_jsonld(page, canonical) -> str:
             "@type": "WebSite",
             "name": BRAND,
             "url": BASE_URL.rstrip("/") + "/",
+        },
+        "datePublished": SITE_UPDATED,
+        "dateModified": SITE_UPDATED,
+        "primaryImageOfPage": {"@type": "ImageObject", "url": OG_IMAGE},
+        "image": OG_IMAGE,
+        "author": {
+            "@type": "Organization",
+            "name": f"{BRAND} 운영팀",
+            "url": BASE_URL.rstrip("/") + "/about/",
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": BRAND,
+            "url": BASE_URL.rstrip("/") + "/",
+            "telephone": PHONE,
+            "logo": {"@type": "ImageObject", "url": LOGO_IMAGE},
         },
     }
     return ('<script type="application/ld+json">\n'
@@ -254,6 +273,10 @@ def render_page(page: dict) -> str:
     {toc_html}
     <article class="page-content">
       {body}
+      <div class="page-byline">
+        <p class="byline-author">작성·검수 <strong>{BRAND} 운영팀</strong> · 서울 전지역 방문 관리 운영</p>
+        <p class="byline-meta">이 안내는 실제 방문 운영 경험을 바탕으로 작성하고 정기적으로 검토합니다. 최종 검토일 <time datetime="{SITE_UPDATED}">{SITE_UPDATED}</time>. 운영 주체·콘텐츠 작성 원칙은 <a href="/about/">운영 안내</a>에서 확인하실 수 있습니다.</p>
+      </div>
     </article>
   </div>
 </main>
@@ -290,6 +313,7 @@ def render_page(page: dict) -> str:
     <nav class="footer-col" aria-label="이용 안내">
       <p class="footer-title">이용 안내</p>
       <ul>
+        <li><a href="/about/">운영 안내</a></li>
         <li><a href="/reservation/">예약안내</a></li>
         <li><a href="/precautions/">이용 전 확인사항</a></li>
         <li><a href="/hometai-guide/">홈타이 이용 가이드</a></li>

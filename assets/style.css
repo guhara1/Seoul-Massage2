@@ -756,3 +756,16 @@ th { background: var(--panel-2); color: var(--gold-soft); font-family: var(--ser
   .page-content section { padding: 26px 22px 22px; border-radius: 14px; }
   .cta { padding: 36px 20px; }
 }
+
+/* 작성·검수 바이라인(E-E-A-T 신뢰 신호) */
+.page-byline {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-left: 3px solid var(--gold, #c8a96a);
+  border-radius: 12px;
+  background: rgba(255,255,255,.02);
+}
+.page-byline .byline-author { margin: 0 0 6px; font-size: .95rem; }
+.page-byline .byline-meta { margin: 0; font-size: .85rem; opacity: .72; line-height: 1.6; }
+.page-byline a { color: var(--gold, #c8a96a); }

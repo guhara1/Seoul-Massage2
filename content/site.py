@@ -493,6 +493,7 @@ NAV = [
         ("전지역 방문 가능", "/#coverage"),
         ("예약 전 확인 기준", "/#check"),
         ("홈타이 이용 가이드", "/hometai-guide/"),
+        ("운영 안내", "/about/"),
     ]),
     ("권역별 안내", "/#areas", [
         (name, area_url(slug)) for slug, name in AREAS
