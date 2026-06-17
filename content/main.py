@@ -97,9 +97,9 @@ _HERO = f"""<section class="hero">
         <a class="hero-btn" href="#coverage">자치구별 안내 보기</a>
       </div>
       <ul class="hero-stats">
+        <li><strong>8개</strong><span>권역 허브</span></li>
         <li><strong>25개</strong><span>자치구</span></li>
-        <li><strong>54개</strong><span>역세권</span></li>
-        <li><strong>전지역</strong><span>방문 가능</span></li>
+        <li><strong>275개</strong><span>역세권</span></li>
         <li><strong>24시간</strong><span>예약 상담</span></li>
       </ul>
     </div>

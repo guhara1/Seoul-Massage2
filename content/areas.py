@@ -38,7 +38,7 @@ AREA_DATA = [
         [("송파구", "songpa-gu-chuljangmassage"), ("강동구", "gangdong-gu-chuljangmassage")],
         [("잠실역", "jamsil-station-chuljangmassage"), ("석촌역", "seokchon-station-chuljangmassage"),
          ("문정역", "munjeong-station-chuljangmassage"), ("가락시장역", "garak-market-station-chuljangmassage"),
-         ("강동역", "gangdong-station-chuljangmassage")],
+         ("천호역", "cheongho-station-chuljangmassage"), ("강동역", "gangdong-station-chuljangmassage")],
         "<p>송파·강동권은 한강 남동쪽을 따라 형성된 대규모 주거 중심 권역입니다. 송파구는 잠실 롯데월드타워 일대의 상업·관광 거점과 문정 법조·업무단지, 가락시장 생활권이 공존하고, 강동구는 천호 상권과 고덕·강일 신축 대단지가 빠르게 성장하고 있습니다. 대단지 아파트 비중이 높아 주말 자택 홈타이 수요가 꾸준하고, 입주가 활발한 신축 단지를 중심으로 정기 케어 이용이 늘고 있는 점이 특징입니다.</p>",
         "<p>이 권역은 송파구·강동구와 잠실역·석촌역·문정역·가락시장역·강동역을 묶어 안내합니다. 잠실·석촌호수 일대는 잠실역·석촌역, 법조단지는 문정역, 가락시장·송파대로 방면은 가락시장역, 천호·강동 생활권은 강동역을 기준으로 안내합니다. 대단지 아파트는 동·호수와 공동현관 출입 방법을 미리 알려주시면 방문이 한결 수월합니다. 고덕·강일 등 외곽 방면은 이동 시간이 다소 걸릴 수 있어 여유 있게 예약해 주세요.</p>",
     ),
