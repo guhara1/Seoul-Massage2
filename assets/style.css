@@ -769,3 +769,7 @@ th { background: var(--panel-2); color: var(--gold-soft); font-family: var(--ser
 .page-byline .byline-author { margin: 0 0 6px; font-size: .95rem; }
 .page-byline .byline-meta { margin: 0; font-size: .85rem; opacity: .72; line-height: 1.6; }
 .page-byline a { color: var(--gold, #c8a96a); }
+
+/* 푸터 권역 그리드(2열) */
+.footer-area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+@media (max-width: 600px) { .footer-area-grid { grid-template-columns: 1fr; } }

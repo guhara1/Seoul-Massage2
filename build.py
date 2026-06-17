@@ -19,7 +19,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from content import PAGES, REDIRECTS
 from content.site import (BASE_URL, BRAND, BRAND_MARK, NAV, PHONE,
-                          PHONE_DISPLAY)
+                          PHONE_DISPLAY, AREAS, area_url)
+
+# 푸터 — 권역 허브 중심으로 구성(원본 템플릿과 다른 구조)
+_FOOTER_AREAS = "".join(
+    f'<li><a href="{area_url(slug)}">{name}</a></li>' for slug, name in AREAS
+)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MIN_INDEX_CHARS = 2000
@@ -284,48 +289,33 @@ def render_page(page: dict) -> str:
   <div class="container footer-grid">
     <div class="footer-col footer-about">
       <p class="footer-brand">{BRAND}</p>
-      <p class="footer-desc">서울특별시 전지역 방문 출장마사지·홈타이 안내 사이트입니다. 모든 서비스는 안내된 관리 범위와 위생·안전 기준 안에서만 제공됩니다.</p>
+      <p class="footer-desc">권역 → 자치구 → 역세권 순으로 좁혀 찾는 서울 방문 마사지 안내입니다. {BRAND} 운영팀이 직접 접수·배정하며, 위생·안전 기준 안에서만 관리를 진행합니다. <a href="/about/">운영 안내</a>에서 작성·운영 원칙을 확인하실 수 있습니다.</p>
       <address class="footer-contact">
-        <span class="footer-contact-row"><span class="footer-label">예약전화</span> <a href="tel:{PHONE}">{PHONE_DISPLAY}</a></span>
-        <span class="footer-contact-row"><span class="footer-label">상담시간</span> 연중무휴 24시간</span>
-        <span class="footer-contact-row"><span class="footer-label">서비스 지역</span> 서울특별시 전지역</span>
+        <span class="footer-contact-row"><span class="footer-label">예약·상담</span> <a href="tel:{PHONE}">{PHONE_DISPLAY}</a></span>
+        <span class="footer-contact-row"><span class="footer-label">운영</span> 연중무휴 24시간 전화 상담</span>
+        <span class="footer-contact-row"><span class="footer-label">방문 범위</span> 서울 25개 자치구 전역</span>
       </address>
     </div>
-    <nav class="footer-col" aria-label="지역 안내">
-      <p class="footer-title">자치구 안내</p>
-      <ul>
-        <li><a href="/seoul/gangnam-gu-chuljangmassage/">강남구 출장마사지</a></li>
-        <li><a href="/seoul/mapo-gu-chuljangmassage/">마포구 출장마사지</a></li>
-        <li><a href="/seoul/yongsan-gu-chuljangmassage/">용산구 출장마사지</a></li>
-        <li><a href="/seoul/seongdong-gu-chuljangmassage/">성동구 출장마사지</a></li>
-        <li><a href="/seoul/seocho-gu-chuljangmassage/">서초구 출장마사지</a></li>
-      </ul>
+    <nav class="footer-col footer-areas" aria-label="권역 안내">
+      <p class="footer-title">권역으로 찾기</p>
+      <ul class="footer-area-grid">{_FOOTER_AREAS}</ul>
     </nav>
-    <nav class="footer-col" aria-label="지하철역 안내">
-      <p class="footer-title">역세권 안내</p>
+    <nav class="footer-col" aria-label="이용·운영 안내">
+      <p class="footer-title">이용·운영 안내</p>
       <ul>
-        <li><a href="/seoul/gangnam-station-chuljangmassage/">강남역</a></li>
-        <li><a href="/seoul/hongik-univ-station-chuljangmassage/">홍대입구역</a></li>
-        <li><a href="/seoul/yeouido-station-chuljangmassage/">여의도역</a></li>
-        <li><a href="/seoul/jamsil-station-chuljangmassage/">잠실역</a></li>
-      </ul>
-    </nav>
-    <nav class="footer-col" aria-label="이용 안내">
-      <p class="footer-title">이용 안내</p>
-      <ul>
-        <li><a href="/about/">운영 안내</a></li>
-        <li><a href="/reservation/">예약안내</a></li>
+        <li><a href="/about/">운영 안내(누가·어떻게·왜)</a></li>
+        <li><a href="/reservation/">예약 방법·이동비·취소</a></li>
         <li><a href="/precautions/">이용 전 확인사항</a></li>
         <li><a href="/hometai-guide/">홈타이 이용 가이드</a></li>
-        <li><a href="/support/">고객센터</a></li>
+        <li><a href="/support/">고객센터·공지</a></li>
         <li><a href="/privacy/">개인정보처리방침</a></li>
       </ul>
     </nav>
   </div>
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <p class="footer-copy">&copy; {BRAND}. All rights reserved.</p>
-      <p class="footer-note">서울특별시 전지역을 안내하는 건전한 방문 관리 사이트이며, 불법적인 요청은 어떤 경우에도 응하지 않습니다.</p>
+      <p class="footer-copy">&copy; {BRAND} · 서울 방문 마사지 지역 안내</p>
+      <p class="footer-note">이완 목적의 방문 관리 안내 사이트로, 의료 행위나 치료 효과를 표방하지 않습니다. 선정적·불법적 요청에는 응하지 않으며, 모든 안내는 {BRAND} 운영팀이 작성·검토합니다.</p>
       <div class="footer-biz">
         <a class="footer-biz-btn biz-build" href="https://t.me/googleseolab" target="_blank" rel="noopener nofollow">웹사이트 제작문의</a>
         <a class="footer-biz-btn biz-ad" href="https://t.me/googleseolab" target="_blank" rel="noopener nofollow">광고문의</a>
