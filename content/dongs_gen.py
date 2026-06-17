@@ -12,6 +12,7 @@ DONG_DATA: 자치구 slug → (자치구 한글명, [(동명, 페이지 slug, �
 """
 from .site import PHONE, PHONE_DISPLAY, DONG_PAGES, dong_related_block
 from .pricing import PRICING
+from .copy_engine import build_body
 
 _CTA = (
     f'<section class="cta"><h2>예약문의</h2>'
@@ -285,7 +286,7 @@ def _make(dong, slug, gu_name, gu_slug, subway, landmarks, trait):
         "title": title,
         "desc": desc,
         "h1": f"{dong} 출장마사지·홈타이 안내",
-        "body": _body(dong, gu_name, subway, landmarks, trait, slug)
+        "body": build_body(dong, "dong", gu_name, subway, landmarks, trait, slug)
         + dong_related_block(gu_slug, gu_name, dong) + PRICING + _CTA,
         "breadcrumb": [
             ("자치구별 안내", "/#districts"),

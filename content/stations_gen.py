@@ -11,6 +11,7 @@ from .site import (PHONE, PHONE_DISPLAY, DISTRICTS, GU_REGION,
                    STATION_GROUPS as BASE_GROUPS,
                    station_url, district_url, station_related_block)
 from .pricing import PRICING
+from .copy_engine import build_body, station_landmarks
 
 _CTA = (
     f'<section class="cta"><h2>예약문의</h2>'
@@ -441,7 +442,8 @@ def build():
         gu_name = _GU_NAME[gu_slug]
         region = GU_REGION.get(gu_slug, "")
         slug = _full_slug(root)
-        body = _body(name, gu_name, lines, feature, region, slug)
+        landmarks = station_landmarks(name, feature)
+        body = build_body(name, "station", gu_name, lines, landmarks, feature, slug)
         pages.append({
             "path": f"seoul/{slug}/",
             "title": _title(name, gu_name, lines, slug),
