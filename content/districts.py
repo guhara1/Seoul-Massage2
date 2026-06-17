@@ -1,17 +1,28 @@
-from .site import (PHONE, PHONE_DISPLAY, BRAND, district_url, station_url, dong_url,
+from .site import (PHONE, PHONE_DISPLAY, BRAND, GU_REGION, DISTRICT_DONGS,
+                   gu_stations, district_url, station_url, dong_url,
                    dong_nav_section, district_related_block)
 from .pricing import PRICING
+from .copy_engine import district_body
 
 _CTA = f"""<section class="cta"><h2>예약문의</h2><p>방문 위치와 희망 시간을 알려주시면 가능 여부를 바로 확인해 드립니다.</p><a class="cta-phone" href="tel:{PHONE}">{PHONE_DISPLAY}</a></section>"""
 
 
 def _district(slug, name, title, desc, body):
+    # 원본 zip 복제본인 수기 본문(body) 대신, 각 구의 실제 행정동·역세권
+    # 데이터로 원본 엔진 본문을 생성한다(사이트 단위 중복 제거).
+    gen = district_body(
+        name,
+        GU_REGION.get(slug, "서울"),
+        DISTRICT_DONGS.get(slug, []),
+        gu_stations(slug, 6),
+        slug,
+    )
     return {
         "path": f"seoul/{slug}/",
         "title": title,
         "desc": desc,
         "h1": f"{name} 출장마사지·홈타이 안내",
-        "body": body + dong_nav_section(slug, name) + district_related_block(slug, name) + PRICING + _CTA,
+        "body": gen + dong_nav_section(slug, name) + district_related_block(slug, name) + PRICING + _CTA,
         "breadcrumb": [("자치구별 안내", "/#districts"), (name, None)],
     }
 

@@ -1,16 +1,53 @@
-from .site import (PHONE, PHONE_DISPLAY, BRAND, district_url, station_url,
+import re as _re
+from .site import (PHONE, PHONE_DISPLAY, BRAND, DISTRICTS, district_url, station_url,
                    station_related_block)
 from .pricing import PRICING
+from .copy_engine import build_body, station_landmarks
 
 _CTA = f"""<section class="cta"><h2>예약문의</h2><p>역 인근 위치와 희망 시간을 알려주시면 방문 가능 여부를 바로 확인해 드립니다.</p><a class="cta-phone" href="tel:{PHONE}">{PHONE_DISPLAY}</a></section>"""
 
+_GU_NAME = {slug: name for slug, name in DISTRICTS}
+_TRANSIT_RE = _re.compile(r"[1-9]호선|신분당선|공항철도|경의중앙선|수인분당선|우이신설선|경춘선|SRT")
+
+
+def _derive(name, title, desc, hand_body):
+    """원본(수기) 본문·제목에서 자치구·노선·지역 특성을 추출한다(허위 생성 방지)."""
+    # 자치구: 본문/설명 안의 첫 자치구 링크 또는 '○○구' 표기
+    gu_name = "서울"
+    m = _re.search(r"/seoul/([a-z-]+)-gu-chuljangmassage/", hand_body)
+    if m and f"{m.group(1)}-gu-chuljangmassage" in _GU_NAME:
+        gu_name = _GU_NAME[f"{m.group(1)}-gu-chuljangmassage"]
+    else:
+        m2 = _re.search(r"([가-힣]+구)\b", desc + " " + hand_body)
+        if m2:
+            gu_name = m2.group(1)
+    # 노선: 리드 앞부분에서 추출
+    head = _re.sub(r"<[^>]+>", " ", hand_body)[:260]
+    lines = []
+    for x in _TRANSIT_RE.findall(head):
+        if x not in lines:
+            lines.append(x)
+    transit = "·".join(lines) if lines else "지하철"
+    # 지역 특성: 제목의 ｜ 뒤 설명에서 '홈타이/출장마사지/안내' 등 군더더기 제거
+    feat = title.split("｜")[-1] if "｜" in title else title
+    feat = _re.sub(r"(출장마사지|홈타이|방문|예약|안내|소개)", "", feat)
+    feat = _re.sub(r"\s+", " ", feat).strip(" ·-")
+    if len(feat) < 4:
+        feat = f"{name} 일대 생활권"
+    return gu_name, transit, feat
+
+
 def _station(slug, name, title, desc, body):
+    # 원본 zip 복제본인 수기 본문 대신, 추출한 실제 데이터로 원본 엔진 본문을 생성한다.
+    gu_name, transit, feat = _derive(name, title, desc, body)
+    landmarks = station_landmarks(name, feat)
+    gen = build_body(name, "station", gu_name, transit, landmarks, feat, slug)
     return {
         "path": f"seoul/{slug}/",
         "title": title,
         "desc": desc,
         "h1": f"{name} 출장마사지·홈타이 안내",
-        "body": body + station_related_block(slug, name) + PRICING + _CTA,
+        "body": gen + station_related_block(slug, name) + PRICING + _CTA,
         "breadcrumb": [("역세권별 안내", "/#stations"), (name, None)],
     }
 

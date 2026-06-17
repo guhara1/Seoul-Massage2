@@ -20,13 +20,14 @@ REDIRECTS = {}
 register_consolidated(REDIRECTS)
 
 # 3) 나머지 페이지 모듈 import (등록된 레지스트리를 사용)
-from . import main, areas, districts, dongs, stations, zones, info
+#    수작업(원본 zip 복제) 동 30개는 dongs_gen 엔진 생성으로 전환했으므로
+#    dongs.PAGES 는 더 이상 포함하지 않는다(중복 경로 방지).
+from . import main, areas, districts, stations, zones, info
 
 PAGES = (
     [main.PAGE]
     + areas.PAGES
     + districts.PAGES
-    + dongs.PAGES
     + dongs_gen.PAGES
     + stations.PAGES
     + stations_gen.PAGES
