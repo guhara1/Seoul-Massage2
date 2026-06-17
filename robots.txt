@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://seoul-massage1.pages.dev/sitemap.xml
+Sitemap: https://seoul-massage2.pages.dev/sitemap.xml

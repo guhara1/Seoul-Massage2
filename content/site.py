@@ -1,5 +1,5 @@
 # 사이트 공통 설정
-BASE_URL = "https://seoul-massage1.pages.dev"
+BASE_URL = "https://seoul-massage2.pages.dev"
 
 BRAND = "웰니스 GO"
 BRAND_MARK = "GO"
